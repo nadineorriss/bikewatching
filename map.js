@@ -87,14 +87,20 @@ map.on('load', () => {
     
         // Update circles with scaled sizes
         const circles = svg.selectAll('circle')
-          .data(stations)
-          .enter()
-          .append('circle')
-          .attr('r', d => radiusScale(d.totalTraffic))
-          .attr('fill', 'steelblue')
-          .attr('fill-opacity', 0.6)
-          .attr('stroke', 'white')
-          .attr('stroke-width', 1);
+        .data(stations)
+        .enter()
+        .append('circle')
+        .attr('r', d => radiusScale(d.totalTraffic))
+        .attr('fill', 'steelblue')
+        .attr('fill-opacity', 0.6)
+        .attr('stroke', 'white')
+        .attr('stroke-width', 1)
+        .each(function(d) {
+          // Add title element for tooltip
+          d3.select(this)
+            .append('title')
+            .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
+        });
     
         function updatePositions() {
           circles
