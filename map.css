@@ -28,3 +28,29 @@ html, body {
     stroke-width: 1px;
     pointer-events: auto;
   }
+  header {
+    display: flex;
+    justify-content: space-between; /* Ensures title is left, filter is right */
+    align-items: center;
+    padding: 1em 2em;
+    width: 100%; /* Make sure header spans full width */
+    max-width: 1200px; /* Optional: keeps it from stretching too much */
+    margin: 0 auto; /* Centers it on the page */
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.5em;
+    white-space: nowrap; /* Prevents title from wrapping */
+}
+
+header label {
+    display: flex;
+    align-items: center;
+    gap: 0.5em; /* Adjust spacing between elements */
+    white-space: nowrap; /* Keeps all elements in a single line */
+}
+
+header input[type="range"] {
+    width: 150px; /* Adjust slider size */
+}
