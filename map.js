@@ -57,6 +57,7 @@ map.on('load', () => {
         stations = stationData.data.stations;
         const trips = tripData;
     
+        // Calculate departures and arrivals
         const departures = d3.rollup(
           trips,
           v => v.length,
@@ -69,6 +70,7 @@ map.on('load', () => {
           d => d.end_station_id
         );
     
+        // Add traffic properties to stations
         stations = stations.map((station) => {
           let id = station.short_name;
           station.arrivals = arrivals.get(id) ?? 0;
@@ -77,17 +79,22 @@ map.on('load', () => {
           return station;
         });
     
-        console.log('First station with traffic data:', stations[0]);
+        // Create square root scale for circle sizes
+        const radiusScale = d3
+          .scaleSqrt()
+          .domain([0, d3.max(stations, d => d.totalTraffic)])
+          .range([0, 25]);
     
+        // Update circles with scaled sizes
         const circles = svg.selectAll('circle')
           .data(stations)
           .enter()
           .append('circle')
-          .attr('r', 5)
+          .attr('r', d => radiusScale(d.totalTraffic))
           .attr('fill', 'steelblue')
+          .attr('fill-opacity', 0.6)
           .attr('stroke', 'white')
-          .attr('stroke-width', 1)
-          .attr('opacity', 0.8);
+          .attr('stroke-width', 1);
     
         function updatePositions() {
           circles
