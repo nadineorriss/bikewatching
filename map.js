@@ -50,40 +50,58 @@ map.on('load', () => {
       paint: bikeLayerStyle
     });
   
-    // Load both stations and traffic data
     Promise.all([
-      d3.json('https://dsc106.com/labs/lab07/data/bluebikes-stations.json'),
-      d3.csv('https://dsc106.com/labs/lab07/data/bluebikes-traffic-2024-03.csv')
-    ]).then(([stationData, tripData]) => {
-      stations = stationData.data.stations;
-      const trips = tripData;
-  
-      console.log('First trip:', trips[0]);
-      console.log('Number of trips:', trips.length);
-  
-      const circles = svg.selectAll('circle')
-        .data(stations)
-        .enter()
-        .append('circle')
-        .attr('r', 5)
-        .attr('fill', 'steelblue')
-        .attr('stroke', 'white')
-        .attr('stroke-width', 1)
-        .attr('opacity', 0.8);
-  
-      function updatePositions() {
-        circles
-          .attr('cx', d => getCoords(d).cx)
-          .attr('cy', d => getCoords(d).cy);
-      }
-  
-      updatePositions();
-      map.on('move', updatePositions);
-      map.on('zoom', updatePositions);
-      map.on('resize', updatePositions);
-      map.on('moveend', updatePositions);
-  
-    }).catch(error => {
-      console.error('Error loading data:', error);
+        d3.json('https://dsc106.com/labs/lab07/data/bluebikes-stations.json'),
+        d3.csv('https://dsc106.com/labs/lab07/data/bluebikes-traffic-2024-03.csv')
+      ]).then(([stationData, tripData]) => {
+        stations = stationData.data.stations;
+        const trips = tripData;
+    
+        const departures = d3.rollup(
+          trips,
+          v => v.length,
+          d => d.start_station_id
+        );
+    
+        const arrivals = d3.rollup(
+          trips,
+          v => v.length,
+          d => d.end_station_id
+        );
+    
+        stations = stations.map((station) => {
+          let id = station.short_name;
+          station.arrivals = arrivals.get(id) ?? 0;
+          station.departures = departures.get(id) ?? 0;
+          station.totalTraffic = station.arrivals + station.departures;
+          return station;
+        });
+    
+        console.log('First station with traffic data:', stations[0]);
+    
+        const circles = svg.selectAll('circle')
+          .data(stations)
+          .enter()
+          .append('circle')
+          .attr('r', 5)
+          .attr('fill', 'steelblue')
+          .attr('stroke', 'white')
+          .attr('stroke-width', 1)
+          .attr('opacity', 0.8);
+    
+        function updatePositions() {
+          circles
+            .attr('cx', d => getCoords(d).cx)
+            .attr('cy', d => getCoords(d).cy);
+        }
+    
+        updatePositions();
+        map.on('move', updatePositions);
+        map.on('zoom', updatePositions);
+        map.on('resize', updatePositions);
+        map.on('moveend', updatePositions);
+    
+      }).catch(error => {
+        console.error('Error loading data:', error);
+      });
     });
-  });
