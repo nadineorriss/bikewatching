@@ -79,34 +79,33 @@ map.on('load', () => {
           return station;
         });
     
-        // Create square root scale for circle sizes
         const radiusScale = d3
           .scaleSqrt()
           .domain([0, d3.max(stations, d => d.totalTraffic)])
           .range([0, 25]);
     
-        // Update circles with scaled sizes
-        const circles = svg.selectAll('circle')
-        .data(stations)
-        .enter()
-        .append('circle')
-        .attr('r', d => radiusScale(d.totalTraffic))
-        .attr('fill', 'steelblue')
-        .attr('fill-opacity', 0.6)
-        .attr('stroke', 'white')
-        .attr('stroke-width', 1)
-        .each(function(d) {
-          // Add title element for tooltip
+          const circles = svg.selectAll('circle')
+          .data(stations)
+          .enter()
+          .append('circle')
+          .attr('r', d => radiusScale(d.totalTraffic))
+          .attr('fill', 'steelblue')
+          .attr('fill-opacity', 0.6)
+          .attr('stroke', 'white')
+          .attr('stroke-width', 1);
+        
+        // Add the detailed tooltips
+        circles.each(function(d) {
           d3.select(this)
             .append('title')
             .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
         });
-    
-        function updatePositions() {
-          circles
-            .attr('cx', d => getCoords(d).cx)
-            .attr('cy', d => getCoords(d).cy);
-        }
+
+function updatePositions() {
+  circles
+    .attr('cx', d => getCoords(d).cx)
+    .attr('cy', d => getCoords(d).cy);
+}
     
         updatePositions();
         map.on('move', updatePositions);
