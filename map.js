@@ -2,7 +2,7 @@ mapboxgl.accessToken = 'pk.eyJ1Ijoibm9ycnJpc3MiLCJhIjoiY203ZjAxYzR0MGs0ZjJycHFqc
 
 const bikeLayerStyle = {
   'line-color': '#32D400',
-  'line-width': 5,
+  'line-width': 15,
   'line-opacity': 0.6
 };
 
